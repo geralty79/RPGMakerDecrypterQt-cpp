@@ -1,51 +1,91 @@
-# RPG Maker Decrypter
+# RPG Maker Decrypter — Qt/C++ Edition
 
-RPG Maker Decrypter can be used to extract encrypted archives and files created with **RPG Maker XP, VX VX Ace, MV or MZ**.
-It can be also used to recreate a best guess of the original project.
+Cross-platform GUI rewrite of [RPG Maker Decrypter](https://github.com/uuksu/RPGMakerDecrypter)
+in **C++17 with Qt 6**. Extract encrypted archives and files created with
+**RPG Maker XP, VX, VX Ace, MV or MZ**, and reconstruct a best guess of the
+original project so it can be opened in the editor again.
 
-## Usage
+> This is a fork of the original .NET/C# project. The original C# CLI sources
+> are kept in this repository for reference (`RPGMakerDecrypter.Cli`,
+> `RPGMakerDecrypter.MVMZ`, `RPGMakerDecrypter.RGSSAD`,
+> `RPGMakerDecrypter.Tests`) and can still be built with the .NET 8 SDK.
 
-RPG Maker Decrypter is an advanced CLI application. To use it, you have a have basic skills of running terminal applications.
+## Features
 
-To decrypt RPG Maker XP, VX and VX Ace games, give the encrypted archive file as input (usually files with .rgssad, .rgss2a or .rgss3a extension, but these might also be renamed to something else). To decrypt MV or MZ games, give the game deployment root directory as the input.
-
-To get available commands, use:
-
-	RPGMakerDecrypter-cli
-	
-To extract archive to same directory where it exists, use
-
-	RPGMakerDecrypter-cli C:\MyRPGMakerGame\Game.rgssad
-	
-To extract RPG Maker XP, VX or VX Ace archive to some other directory, use
-
-	RPGMakerDecrypter-cli C:\MyRPGMakerGame\Game.rgssad --output=C:\OtherDirectory
-
-To extract RPG Maker MV or MZ game to some other directory, use
-
-	RPGMakerDecrypter-cli C:\MyRPGMakerGame\Game --output=C:\OtherDirectory
-	
-To give a best guess in creating the original project, use
-
-	RPGMakerDecrypter-cli C:\MyRPGMakerGame\Game.rgssad --recreate-project
-
-You must always specify the output directory when recreating a project for MV or MZ.
-
-	RPGMakerDecrypter-cli C:\MyRPGMakerGame\Game.rgssad --recreate-project --output=C:\OtherDirectory
-
-## RPG Maker Decrypter GUI
-
-Unfortunately, support for GUI has ended. Sources still exist in [history](https://github.com/uuksu/RPGMakerDecrypter/tree/1a24e8c0a9bbf7b9b1cb030a6a2eb20882e6df15). Maybe you would like to continue the development of the Windows-only Forms GUI or create a totally new cross-platform alternative?
+- **RPG Maker XP / VX / VX Ace archives** (`.rgssad`, `.rgss2a`, `.rgss3a`) —
+  extracted with the original directory structure, including archives that
+  have been renamed (the format version is read from the file header).
+- **RPG Maker MV / MZ deployments** — encrypted assets (`.rpgmvo`, `.rpgmvp`,
+  `.rpgmvm`, `.ogg_`, `.png_`, `.m4a_`) are decrypted in place using the
+  encryption key from `System.json`. Windows, Linux and macOS `.app`
+  deployments are supported.
+- **Project reconstruction** — writes the project files that make the RPG
+  Maker editors recognize the game again:
+  - XP/VX/VX Ace: `Game.rxproj` / `Game.rvproj` / `Game.rvproj2` + `Game.ini`
+  - MV: `Game.rpgproject`, MZ: `game.rmmzproject`
+- **GUI comforts**: automatic RPG Maker version detection, output directory
+  selection, overwrite protection, progress bar and log, and cancellation of
+  long operations at any time.
 
 ## Requirements
 
-*  Application works with any platform .NET 8.0 targets.
-* .NET Runtime is not required for prebuilt binaries on selected platforms as it is packaged in the executable.
+- The GUI application is a native binary. Building it requires a C++17
+  compiler, CMake 3.21+ and **Qt 6.4+** (`Widgets` and `Core` modules).
+- The original C# CLI requires the .NET 8 SDK.
 
-## Binaries
+## Building (Qt/C++ GUI)
 
-Prebuilt binaries are available for selected platforms. See [Releases](https://github.com/uuksu/RPGMakerDecrypter/releases).
+```bash
+cmake -S RPGMakerDecrypter.Cpp -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+```
 
-## Building
+On Debian/Ubuntu, install the toolchain with:
 
-CLI application will compile with .NET 8.0 SDK, libraries target .NET Standard 2.0.
+```bash
+sudo apt install build-essential cmake qt6-base-dev
+```
+
+This produces the GUI application `build/RPGMakerDecrypter` and the
+self-test binary `build/RPGMakerDecrypterTests` (run with `ctest`). See
+[RPGMakerDecrypter.Cpp/README.md](RPGMakerDecrypter.Cpp/README.md) for
+platform-specific notes and the roadmap in
+[RPGMakerDecrypter.Cpp/PLAN.md](RPGMakerDecrypter.Cpp/PLAN.md).
+
+## Using the GUI
+
+1. Pick the input with **Browse File...** (an RGSSAD archive) or
+   **Browse Folder...** (an MV/MZ deployment directory) — the RPG Maker
+   version is detected automatically and shown.
+2. Optionally choose an output directory. Empty means: archives extract next
+   to the archive, MV/MZ files decrypt in place.
+3. Enable **Reconstruct project** to generate the project files for the
+   editor (MV/MZ requires an output directory for this).
+4. Enable **Overwrite existing files** when the output directory should be
+   reused.
+5. **Start**, watch the progress and log, **Cancel** anytime.
+
+The detailed decryption/compatibility notes are in the
+[C++ README](RPGMakerDecrypter.Cpp/README.md#feature-parity-notes).
+
+## Building the original C# CLI
+
+```bash
+dotnet build -c Release RPGMakerDecrypter.sln
+dotnet run --project RPGMakerDecrypter.Cli -- <archive-or-directory>
+```
+
+See the [original README](https://github.com/uuksu/RPGMakerDecrypter#usage)
+for CLI options.
+
+## Acknowledgments
+
+- [Mikko Uuksulainen (uuksu)](https://github.com/uuksu) — original
+  RPGMakerDecrypter and the archive format research it is based on.
+- RPG Maker archive decryption algorithms are well documented by the
+  community; this project reimplements them (see `RPGMakerDecrypter.Tests`
+  for compatibility fixtures).
+
+## License
+
+MIT — same as the original project. See [LICENSE.txt](LICENSE.txt).
