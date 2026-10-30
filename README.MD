@@ -6,7 +6,7 @@ in **C++17 with Qt 6**. Extract encrypted archives and files created with
 original project so it can be opened in the editor again.
 
 > This is a fork of the original .NET/C# project. The original C# CLI sources
-> are kept in this repository for reference (`RPGMakerDecrypter.Cli`,
+> are kept for reference under [`legacy/`](legacy/) (`RPGMakerDecrypter.Cli`,
 > `RPGMakerDecrypter.MVMZ`, `RPGMakerDecrypter.RGSSAD`,
 > `RPGMakerDecrypter.Tests`) and can still be built with the .NET 8 SDK.
 
@@ -70,9 +70,11 @@ The detailed decryption/compatibility notes are in the
 
 ## Building the original C# CLI
 
+The reference implementation lives under [legacy/](legacy/):
+
 ```bash
-dotnet build -c Release RPGMakerDecrypter.sln
-dotnet run --project RPGMakerDecrypter.Cli -- <archive-or-directory>
+dotnet build -c Release legacy/RPGMakerDecrypter.sln
+dotnet run --project legacy/RPGMakerDecrypter.Cli -- <archive-or-directory>
 ```
 
 See the [original README](https://github.com/uuksu/RPGMakerDecrypter#usage)

@@ -130,28 +130,28 @@ before dispatch.
 
 ## 3. Directory hygiene
 
+Done: the original C# projects were moved under `legacy/` for reference and
+still build with the .NET 8 SDK. The fixtures in
+`legacy/RPGMakerDecrypter.Tests/EncryptedArchives` (real archives produced by
+the RPG Maker editors) are valuable for validating the C++ core against real
+encrypted data — see the backlog section.
+
 Safe to remove now:
 
-- `build/` (repo root, 3.4 MB) — generated CMake output, fully regenerable.
+- `build/` (repo root) — generated CMake output, fully regenerable.
   Prefer out-of-tree builds (`cmake -S RPGMakerDecrypter.Cpp -B build-cpp`).
 - Not in the repo but regenerable: `/tmp/opencode/rpgmaker-build` scratch build.
 
-Only removable if the C# project is retired (user decision; the C++/Qt app has
-complete, tested feature parity, but the C# tests and CLI are handy reference):
+Can be removed once the C++ core has been validated against the real C# test
+fixtures:
 
-- `RPGMakerDecrypter.Cli/`
-- `RPGMakerDecrypter.Common/`
-- `RPGMakerDecrypter.MVMZ/`
-- `RPGMakerDecrypter.RGSSAD/`
-- `RPGMakerDecrypter.Tests/`
-- `RPGMakerDecrypter.sln`
+- `legacy/` — the complete C# reference implementation.
 
 Keep:
 
-- `RPGMakerDecrypter.Cpp/` — the new GUI application
+- `RPGMakerDecrypter.Cpp/` — the GUI application
 - `Resources/` — icon sources (drag-and-drop/icon work will need it)
-- `README.MD` (needs an update to point at the Qt app), `CHANGELOG.MD`,
-  `LICENSE.txt`, `.gitignore`, `.gitattributes`
+- `README.MD`, `CHANGELOG.MD`, `LICENSE.txt`, `.gitignore`, `.gitattributes`
 
 Do NOT touch:
 
